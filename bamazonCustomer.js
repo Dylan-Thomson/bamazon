@@ -4,17 +4,17 @@ const inquirer = require("inquirer");
 const {table} = require("table");
 
 const connection = mysql.createConnection({
-  host: "localhost",
-  port: 3306,
-  user: "root",
-  password: process.env.DB_PASSWORD,
-  database: "bamazon"
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: process.env.DB_PASSWORD,
+    database: "bamazon"
 });
 
-connection.connect(function(err) {
-  if (err) throw err;
-  console.log("=========== WELCOME TO BAMAZON ===========");
-  displayProducts().then(purchasePrompt);
+connection.connect(err => {
+    if (err) throw err;
+    console.log("=========== WELCOME TO BAMAZON ===========");
+    displayProducts().then(purchasePrompt);
 });
 
 // Display all entries in database with ids, name, and price
@@ -55,7 +55,7 @@ function purchasePrompt(rowCount) {
                 }
                 // Make sure ID exists. Highest ID is equal to the length of the data table (the number of rows)
                 else if(Number(input) > rowCount) {
-                    return "Item number not found";
+                    return "Item number not found.";
                 }
                 else {
                     return true;
