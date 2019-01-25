@@ -18,7 +18,8 @@
   "homepage": "https://github.com/Dylan-Thomson/bamazon#readme",
   "dependencies": {
     "dotenv": "^6.2.0",
-    "faker": "^4.1.0",
-    "mysql": "^2.16.0"
+    "inquirer": "^6.2.1",
+    "mysql": "^2.16.0",
+    "table": "^5.2.1"
   }
 }
