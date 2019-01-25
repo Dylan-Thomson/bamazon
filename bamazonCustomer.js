@@ -78,32 +78,44 @@ function purchasePrompt(rowCount) {
         }
     ]).then(input => {
         console.log("Processing order -> Item ID: " + input.itemID + " Quantity: " + input.purchaseQuantity);
-        connection.query("SELECT products.stock_quantity, products.price FROM products WHERE ?", {id: input.itemID}, (err, res) => {
-            const item = res[0];
-            // Check to see if there is enough in stock to fulfill order
-            if(input.purchaseQuantity > item.stock_quantity) {
-                console.log("Insufficient quantity!!!");
-            }
-            else {
-                // Update quantity of item in stock and display purchase total
-                connection.query("UPDATE products SET ? WHERE ?", 
-                [
-                    {
-                        stock_quantity: Number(item.stock_quantity) - Number(input.purchaseQuantity)
-                    },
-                    {
-                        id: input.itemID
-                    }
-                ], (err, res) => {
-                    if(err) console.log(err);
-                    const total = Number(input.purchaseQuantity) * Number(item.price);
-                    console.log("Total: $" + total.toFixed(2));
-                });
-            }
-        });
+        attemptTransaction(input);
     });
 }
 
+// Select product by ID and purchase if there is enough in stock
+function attemptTransaction(input) {
+    connection.query("SELECT products.product_name, products.stock_quantity, products.price FROM products WHERE ?", {id: input.itemID}, (err, res) => {
+        const item = res[0];
+        if(input.purchaseQuantity > item.stock_quantity) {
+            console.log("Insufficient quantity!!!");
+            connection.end();
+        }
+        else {
+            purchase(input, item);
+        }
+    });
+}
+
+// Update quantity of item in stock and display purchase total
+function purchase(input, item) {
+    connection.query("UPDATE products SET ? WHERE ?", 
+    [
+        {
+            stock_quantity: Number(item.stock_quantity) - Number(input.purchaseQuantity)
+        },
+        {
+            id: input.itemID
+        }
+    ], (err, res) => {
+        if(err) console.log(err);
+        const total = Number(input.purchaseQuantity) * Number(item.price);
+        console.log("You purchased " + input.purchaseQuantity + " " + item.product_name + "\nTotal: $" + total.toFixed(2));
+        connection.end();
+    });
+
+}
+
+// Validates whether input is a positive integer
 function isPositiveInteger(input) {
     const number = Number(input);
     return Number.isInteger(number) && String(number) === input && number > 0;
