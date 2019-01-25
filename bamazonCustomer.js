@@ -78,17 +78,27 @@ function purchasePrompt(rowCount) {
         }
     ]).then(input => {
         console.log("Processing order -> Item ID: " + input.itemID + " Quantity: " + input.purchaseQuantity);
-        connection.query("SELECT * FROM products WHERE ?", {id: input.itemID}, (err, res) => {
+        connection.query("SELECT products.stock_quantity, products.price FROM products WHERE ?", {id: input.itemID}, (err, res) => {
             const item = res[0];
             // Check to see if there is enough in stock to fulfill order
             if(input.purchaseQuantity > item.stock_quantity) {
                 console.log("Insufficient quantity!!!");
             }
             else {
-                console.log(input.purchaseQuantity, item.price);
-                const total = Number(input.purchaseQuantity) * Number(item.price);
-                console.log("You spent $" + total.toFixed(2));
                 // Update quantity of item in stock and display purchase total
+                connection.query("UPDATE products SET ? WHERE ?", 
+                [
+                    {
+                        stock_quantity: Number(item.stock_quantity) - Number(input.purchaseQuantity)
+                    },
+                    {
+                        id: input.itemID
+                    }
+                ], (err, res) => {
+                    if(err) console.log(err);
+                    const total = Number(input.purchaseQuantity) * Number(item.price);
+                    console.log("Total: $" + total.toFixed(2));
+                });
             }
         });
     });
