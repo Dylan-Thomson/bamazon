@@ -13,6 +13,7 @@ const connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
+  console.log("=========== WELCOME TO BAMAZON ===========");
   displayProducts().then(purchasePrompt);
 });
 
@@ -76,12 +77,22 @@ function purchasePrompt(rowCount) {
             }
         }
     ]).then(input => {
-        console.log(input.itemID, input.purchaseQuantity);
+        console.log("Processing order -> Item ID: " + input.itemID + " Quantity: " + input.purchaseQuantity);
+        connection.query("SELECT * FROM products WHERE ?", {id: input.itemID}, (err, res) => {
+            const item = res[0];
+            // Check to see if there is enough in stock to fulfill order
+            if(input.purchaseQuantity > item.stock_quantity) {
+                console.log("Insufficient quantity!!!");
+            }
+            else {
+                console.log(input.purchaseQuantity, item.price);
+                const total = Number(input.purchaseQuantity) * Number(item.price);
+                console.log("You spent $" + total.toFixed(2));
+                // Update quantity of item in stock and display purchase total
+            }
+        });
     });
 }
-// Check to see if there is enough in stock to fulfill order
-//  If not, cancel order and tell user there isn't enough in stock
-// Update quantity of item in stock and display purchase total
 
 function isPositiveInteger(input) {
     const number = Number(input);
