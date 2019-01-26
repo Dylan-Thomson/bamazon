@@ -26,6 +26,7 @@ const commands = {
 }
 
 function managerMenu() {
+    console.log("=========== BAMAZON MANAGER ===========");
     inquirer.prompt([
         {
             type: "list",
@@ -40,8 +41,8 @@ function managerMenu() {
 
 function viewProducts() {
     console.log("Viewing Products");
-    connection.query("SELECT * FROM PRODUCTS", (err, res) => {
-        if(err) throw err;
+    connection.query("SELECT * FROM products", (err, res) => {
+        if(err) console.log(err);
         console.log(buildDisplayTable(res));
         managerMenu();
     });
@@ -49,7 +50,7 @@ function viewProducts() {
 
 function viewLowInventory() {
     console.log("Viewing Low Inventory");
-    connection.query("SELECT * FROM PRODUCTS WHERE products.stock_quantity <= 5", (err, res) => {
+    connection.query("SELECT * FROM products WHERE products.stock_quantity <= 5", (err, res) => {
         if(err) console.log(err);
         console.log(buildDisplayTable(res));
         managerMenu();
@@ -58,6 +59,47 @@ function viewLowInventory() {
 
 function addInventory() {
     console.log("Adding Inventory");
+    connection.query("SELECT COUNT(*) FROM products", (err, res) => {
+        const maxID = res[0]["COUNT(*)"]
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "itemID",
+                message: "Enter the ID number for the item you wish to restock",
+                validate: input => {
+                    // Make sure input is an integer greater than zero
+                    if(!isPositiveInteger(input)) {
+                        return "Please enter an integer number greater than zero.";
+                    }
+                    // Make sure ID exists. Highest ID is equal to the length of the data table (the number of rows)
+                    else if(Number(input) > maxID) {
+                        return "Item number not found.";
+                    }
+                    return true;
+                }
+            },
+            {
+                type: "input",
+                name: "restockQuantity",
+                message: "Enter the quantity to restock",
+                validate: input => {
+                    // Make sure input is an integer greater than zero
+                    if(!isPositiveInteger(input)) {
+                        return "Please enter an integer number greater than zero.";
+                    }
+                    return true;
+                }
+            }
+        ]).then(input => {
+            connection.query("UPDATE products SET products.stock_quantity = products.stock_quantity + " + Number(input.restockQuantity) + " WHERE ?", 
+            {id: Number(input.itemID)}, 
+            (err, res) => {
+                if(err) console.log(err);
+                console.log(input.restockQuantity + " added to stock for " + input.itemID);
+                managerMenu();
+            });
+        });
+    });
 }
 
 function addNewProduct() {
@@ -76,8 +118,13 @@ function buildDisplayTable(data) {
     return table(dataTable);
 }
 
+// Validates whether input is a positive integer TODO MOVE
+function isPositiveInteger(input) {
+    const number = Number(input);
+    return Number.isInteger(number) && String(number) === input && number > 0;
+}
+
 connection.connect(err => {
     if (err) throw err;
-    // console.log("=========== WELCOME TO BAMAZON ===========");
     managerMenu();
 });
