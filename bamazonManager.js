@@ -104,6 +104,54 @@ function addInventory() {
 
 function addNewProduct() {
     console.log("Adding New Product");
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "product_name",
+            message: "Enter product name"
+        },
+        {
+            type: "input",
+            name: "department_name",
+            message: "Enter department"
+        },
+        {
+            type: "input",
+            name: "price",
+            message: "Enter price",
+            // validate: input => {
+            //     // Make sure input is an integer greater than zero
+            //     if(!isPositiveInteger(input)) {
+            //         return "Please enter an integer number greater than zero.";
+            //     }
+            //     return true;
+            // }
+        },
+        {
+            type: "input",
+            name: "stock_quantity",
+            message: "Enter stock quantity",
+            validate: input => {
+                // Make sure input is an integer greater than zero
+                if(!isPositiveInteger(input)) {
+                    return "Please enter an integer number greater than zero.";
+                }
+                return true;
+            }
+        }
+    ]).then(input => {
+        connection.query("INSERT INTO products SET ?",
+        {
+            product_name: input.product_name,
+            price: Number(input.price),
+            department_name: input.department_name,
+            stock_quantity: input.stock_quantity
+        }, (err, res) => {
+            if(err) console.log(err)
+            console.log("Added " + input.product_name);
+            managerMenu();
+        });
+    })
 }
 
 function exit() {
