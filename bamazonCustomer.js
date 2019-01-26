@@ -3,18 +3,13 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const {table} = require("table");
 
+// Set up connection to DB
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
     password: process.env.DB_PASSWORD,
     database: "bamazon"
-});
-
-connection.connect(err => {
-    if (err) throw err;
-    console.log("=========== WELCOME TO BAMAZON ===========");
-    displayProducts().then(purchasePrompt);
 });
 
 // Display all entries in database with ids, name, and price
@@ -33,7 +28,7 @@ function displayProducts() {
                 
                 // Display products as a table
                 console.log(table(data));
-
+                
                 // Pass length of data to then() callback for validation
                 resolve(data.length);
             }
@@ -112,7 +107,7 @@ function purchase(input, item) {
         console.log("You purchased " + input.purchaseQuantity + " " + item.product_name + "\nTotal: $" + total.toFixed(2));
         connection.end();
     });
-
+    
 }
 
 // Validates whether input is a positive integer
@@ -121,3 +116,9 @@ function isPositiveInteger(input) {
     return Number.isInteger(number) && String(number) === input && number > 0;
 }
 
+// Connect to DB and run
+connection.connect(err => {
+    if (err) throw err;
+    console.log("=========== WELCOME TO BAMAZON ===========");
+    displayProducts().then(purchasePrompt);
+});
