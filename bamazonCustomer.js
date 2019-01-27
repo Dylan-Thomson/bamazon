@@ -1,16 +1,7 @@
-require("dotenv").config();
-const mysql = require("mysql");
 const inquirer = require("inquirer");
 const {table} = require("table");
-
-// Set up connection to DB
-const connection = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: process.env.DB_PASSWORD,
-    database: "bamazon"
-});
+const validate = require("./modules/validate");
+const connection = require("./modules/connection");
 
 // Display all entries in database with ids, name, and price
 function displayProducts() {
@@ -21,7 +12,7 @@ function displayProducts() {
             }
             else {
                 // Construct data for table
-                const data = [];
+                const data = [["ID", "Product", "Price"]];
                 res.forEach(row => {
                     data.push([row.id, row.product_name, "$" + row.price]);
                 });
@@ -29,47 +20,26 @@ function displayProducts() {
                 // Display products as a table
                 console.log(table(data));
                 
-                // Pass length of data to then() callback for validation
-                resolve(data.length);
+                resolve();
             }
         });
     });
 }
 
 // Prompt user to type id of product they wish to buy and quantity
-function purchasePrompt(rowCount) {
+function purchasePrompt() {
     inquirer.prompt([
         {
             type: "input",
             name: "itemID",
             message: "Enter the ID number for the item you wish to purchase:",
-            validate: input => {
-                // Make sure input is an integer greater than zero
-                if(!isPositiveInteger(input)) {
-                    return "Please enter an integer number greater than zero.";
-                }
-                // Make sure ID exists. Highest ID is equal to the length of the data table (the number of rows)
-                else if(Number(input) > rowCount) {
-                    return "Item number not found.";
-                }
-                else {
-                    return true;
-                }
-            }
+            validate: validate.validateID
         },
         {
             type: "input",
             name: "purchaseQuantity",
             message: "Enter the quantity you wish to purchase:",
-            validate: input => {
-                // Make sure input is an integer greater than zero
-                if(!isPositiveInteger(input)) {
-                    return "Please enter an integer number greater than zero.";
-                }
-                else {
-                    return true;
-                }
-            }
+            validate: validate.validateQuantity
         }
     ]).then(input => {
         console.log("Processing order -> Item ID: " + input.itemID + " Quantity: " + input.purchaseQuantity);
@@ -83,7 +53,7 @@ function attemptTransaction(input) {
         const item = res[0];
         if(input.purchaseQuantity > item.stock_quantity) {
             console.log("Insufficient quantity!!!");
-            connection.end();
+            purchasePrompt();
         }
         else {
             purchase(input, item);
@@ -108,12 +78,6 @@ function purchase(input, item) {
         connection.end();
     });
     
-}
-
-// Validates whether input is a positive integer
-function isPositiveInteger(input) {
-    const number = Number(input);
-    return Number.isInteger(number) && String(number) === input && number > 0;
 }
 
 // Connect to DB and run

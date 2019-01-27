@@ -1,22 +1,10 @@
-require("dotenv").config();
-const mysql = require("mysql");
+const connection = require("./modules/connection");
+const validate = require("./modules/validate");
 const inquirer = require("inquirer");
 const {table} = require("table");
+const Command = require("./modules/Command");
 
-const connection = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: process.env.DB_PASSWORD,
-    database: "bamazon"
-});
-
-class Command {
-    constructor(run) {
-        this.run = run;
-    }
-}
-
+// Define commands for manager menu
 const commands = {
     "View Products for Sale": new Command(viewProducts),
     "View Low Inventory": new Command(viewLowInventory),
@@ -25,6 +13,7 @@ const commands = {
     "Exit": new Command(exit)
 }
 
+// Prompt user to select a manager function
 function managerMenu() {
     console.log("=========== BAMAZON MANAGER ===========");
     inquirer.prompt([
@@ -39,6 +28,7 @@ function managerMenu() {
     });
 }
 
+// Display all products
 function viewProducts() {
     console.log("Viewing Products");
     connection.query("SELECT * FROM products", (err, res) => {
@@ -48,60 +38,44 @@ function viewProducts() {
     });
 }
 
+// Display products with less than 5 in stock
 function viewLowInventory() {
     console.log("Viewing Low Inventory");
-    connection.query("SELECT * FROM products WHERE products.stock_quantity <= 5", (err, res) => {
+    connection.query("SELECT * FROM products WHERE products.stock_quantity < 5", (err, res) => {
         if(err) console.log(err);
         console.log(buildDisplayTable(res));
         managerMenu();
     });
 }
 
+// Add stock to selected item
 function addInventory() {
     console.log("Adding Inventory");
-    connection.query("SELECT COUNT(*) FROM products", (err, res) => {
-        const maxID = res[0]["COUNT(*)"]
-        inquirer.prompt([
-            {
-                type: "input",
-                name: "itemID",
-                message: "Enter the ID number for the item you wish to restock",
-                validate: input => {
-                    // Make sure input is an integer greater than zero
-                    if(!isPositiveInteger(input)) {
-                        return "Please enter an integer number greater than zero.";
-                    }
-                    // Make sure ID exists. Highest ID is equal to the length of the data table (the number of rows)
-                    else if(Number(input) > maxID) {
-                        return "Item number not found.";
-                    }
-                    return true;
-                }
-            },
-            {
-                type: "input",
-                name: "restockQuantity",
-                message: "Enter the quantity to restock",
-                validate: input => {
-                    // Make sure input is an integer greater than zero
-                    if(!isPositiveInteger(input)) {
-                        return "Please enter an integer number greater than zero.";
-                    }
-                    return true;
-                }
-            }
-        ]).then(input => {
-            connection.query("UPDATE products SET products.stock_quantity = products.stock_quantity + " + Number(input.restockQuantity) + " WHERE ?", 
-            {id: Number(input.itemID)}, 
-            (err, res) => {
-                if(err) console.log(err);
-                console.log(input.restockQuantity + " added to stock for " + input.itemID);
-                managerMenu();
-            });
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "itemID",
+            message: "Enter the ID number for the item you wish to restock",
+            validate: validate.validateID
+        },
+        {
+            type: "input",
+            name: "restockQuantity",
+            message: "Enter the quantity to restock",
+            validate: validate.validateQuantity
+        }
+    ]).then(input => {
+        connection.query("UPDATE products SET products.stock_quantity = products.stock_quantity + " + Number(input.restockQuantity) + " WHERE ?", 
+        {id: Number(input.itemID)}, 
+        (err, res) => {
+            if(err) console.log(err);
+            console.log(input.restockQuantity + " added to stock for " + input.itemID);
+            managerMenu();
         });
     });
 }
 
+// Insert new product into table
 function addNewProduct() {
     console.log("Adding New Product");
     inquirer.prompt([
@@ -119,31 +93,19 @@ function addNewProduct() {
             type: "input",
             name: "price",
             message: "Enter price",
-            // validate: input => {
-            //     // Make sure input is an integer greater than zero
-            //     if(!isPositiveInteger(input)) {
-            //         return "Please enter an integer number greater than zero.";
-            //     }
-            //     return true;
-            // }
+            validate: validate.validatePrice
         },
         {
             type: "input",
             name: "stock_quantity",
             message: "Enter stock quantity",
-            validate: input => {
-                // Make sure input is an integer greater than zero
-                if(!isPositiveInteger(input)) {
-                    return "Please enter an integer number greater than zero.";
-                }
-                return true;
-            }
+            validate: validate.validateQuantity
         }
     ]).then(input => {
         connection.query("INSERT INTO products SET ?",
         {
             product_name: input.product_name,
-            price: Number(input.price),
+            price: input.price,
             department_name: input.department_name,
             stock_quantity: input.stock_quantity
         }, (err, res) => {
@@ -154,10 +116,12 @@ function addNewProduct() {
     })
 }
 
+// End connection and exit program
 function exit() {
     connection.end();
 }
 
+// Build manager display table, might move to a module
 function buildDisplayTable(data) {
     const dataTable = [["Item ID", "Product Name", "Department", "Sale Price", "Stock Quantity"]];
     data.forEach(row => {
@@ -166,12 +130,7 @@ function buildDisplayTable(data) {
     return table(dataTable);
 }
 
-// Validates whether input is a positive integer TODO MOVE
-function isPositiveInteger(input) {
-    const number = Number(input);
-    return Number.isInteger(number) && String(number) === input && number > 0;
-}
-
+// Connect to DB and run
 connection.connect(err => {
     if (err) throw err;
     managerMenu();
