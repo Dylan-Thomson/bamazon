@@ -50,6 +50,7 @@ function purchasePrompt() {
 // Select product by ID and purchase if there is enough in stock
 function attemptTransaction(input) {
     connection.query("SELECT products.product_name, products.stock_quantity, products.price FROM products WHERE ?", {id: input.itemID}, (err, res) => {
+        if(err) console.log(err);
         const item = res[0];
         if(input.purchaseQuantity > item.stock_quantity) {
             console.log("Insufficient quantity!!!");
