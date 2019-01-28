@@ -1,7 +1,7 @@
+const connection = require("./modules/connection");
+const validate = require("./modules/validate");
 const inquirer = require("inquirer");
 const {table} = require("table");
-const validate = require("./modules/validate");
-const connection = require("./modules/connection");
 
 // Display all entries in database with ids, name, and price
 function displayProducts() {
