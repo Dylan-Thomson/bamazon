@@ -30,4 +30,17 @@ VALUES ("Inserter", "Logistics", 1321.20, 20);
 INSERT INTO products(product_name, department_name, price, stock_quantity)
 VALUES ("Pipe", "Logistics", 177.31, 20);
 
+INSERT INTO departments(department_name, over_head_costs)
+VALUES ("Materials", 10000);
+
+INSERT INTO departments(department_name, over_head_costs)
+VALUES ("Mining", 15000);
+
+INSERT INTO departments(department_name, over_head_costs)
+VALUES ("Smelting", 20000);
+
+INSERT INTO departments(department_name, over_head_costs)
+VALUES ("Logistics", 25000);
+
 SELECT * FROM products;
+SELECT * FROM departments;
