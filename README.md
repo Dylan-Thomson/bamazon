@@ -25,4 +25,4 @@ Finally, creating and working with the database required a great deal of researc
 * [inquirer](https://www.npmjs.com/package/inquirer) for prompting user input
 * [table](https://www.npmjs.com/package/table) for displaying tabular data in terminal
 * [dotenv](https://www.npmjs.com/package/dotenv) for hiding sensitive data from GitHub
-* [mysql](https://www.npmjs.com/package/mysql) for connecting to MySQL database
+* [mysql](https://www.npmjs.com/package/mysql) for connecting to and working with MySQL database

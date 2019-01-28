@@ -53,8 +53,16 @@ function validateID(input) {
     return testID.then(result => result);
 }
 
+function validateString(input) {
+    if(input === "") {
+        return "Please enter a value."
+    }
+    return true;
+}
+
 module.exports = {
     validateID: validateID,
     validateQuantity: validateQuantity,
-    validatePrice: validatePrice
+    validatePrice: validatePrice,
+    validateString: validateString
 }

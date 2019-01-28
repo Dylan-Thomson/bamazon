@@ -46,7 +46,8 @@ function createNewDepartment() {
         {
             type: "input",
             name: "department_name",
-            message: "Enter department name"
+            message: "Enter department name",
+            validate: validate.validateString
         },
         {
             type: "input",

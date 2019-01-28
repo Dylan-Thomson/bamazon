@@ -82,12 +82,14 @@ function addNewProduct() {
         {
             type: "input",
             name: "product_name",
-            message: "Enter product name"
+            message: "Enter product name",
+            validate: validate.validateString
         },
         {
             type: "input",
             name: "department_name",
-            message: "Enter department"
+            message: "Enter department",
+            validate: validate.validateString
         },
         {
             type: "input",
