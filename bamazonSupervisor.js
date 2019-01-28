@@ -1,7 +1,7 @@
 const connection = require("./modules/connection");
 const validate = require("./modules/validate");
 const inquirer = require("inquirer");
-const {table} = require("table");
+const tableBuilder = require("./modules/tableBuilder");
 const Command = require("./modules/Command");
 
 // Define commands for supervisor menu
@@ -33,7 +33,7 @@ function viewProductSales() {
     query += " GROUP BY departments.department_id";
     connection.query(query, (err, res) => {
         if(err) throw err;
-        console.log(buildProductSalesTable(res));
+        console.log(tableBuilder.buildProductSalesTable(res));
         supervisorMenu();
     });
 }
@@ -70,14 +70,6 @@ function createNewDepartment() {
 // End connection and exit program
 function exit() {
     connection.end();
-}
-
-function buildProductSalesTable(data) {
-    const dataTable = [["Department ID", "Department Name", "Overhead Costs", "Department Sales", "Total Profit"]];
-    data.forEach(row => {
-        dataTable.push([row.department_id, row.department_name, row.over_head_costs, row.department_sales, "$" + Number(row.total_profit).toFixed(2)]);
-    });
-    return table(dataTable);
 }
 
 // Connect to DB and run

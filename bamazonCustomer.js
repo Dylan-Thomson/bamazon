@@ -1,7 +1,7 @@
 const connection = require("./modules/connection");
 const validate = require("./modules/validate");
 const inquirer = require("inquirer");
-const {table} = require("table");
+const tableBuilder = require("./modules/tableBuilder");
 
 // Display all entries in database with ids, name, and price
 function displayProducts() {
@@ -11,15 +11,7 @@ function displayProducts() {
                 reject(err);
             }
             else {
-                // Construct data for table
-                const data = [["ID", "Product", "Price"]];
-                res.forEach(row => {
-                    data.push([row.id, row.product_name, "$" + row.price]);
-                });
-                
-                // Display products as a table
-                console.log(table(data));
-                
+                console.log(tableBuilder.buildCustomerProductTable(res));            
                 resolve();
             }
         });

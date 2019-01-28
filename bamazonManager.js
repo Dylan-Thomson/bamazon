@@ -1,7 +1,7 @@
 const connection = require("./modules/connection");
 const validate = require("./modules/validate");
 const inquirer = require("inquirer");
-const {table} = require("table");
+const tableBuilder = require("./modules/tableBuilder");
 const Command = require("./modules/Command");
 
 // Define commands for manager menu
@@ -33,7 +33,7 @@ function viewProducts() {
     console.log("Viewing Products");
     connection.query("SELECT * FROM products", (err, res) => {
         if(err) console.log(err);
-        console.log(buildDisplayTable(res));
+        console.log(tableBuilder.buildManagerTable(res));
         managerMenu();
     });
 }
@@ -43,7 +43,7 @@ function viewLowInventory() {
     console.log("Viewing Low Inventory");
     connection.query("SELECT * FROM products WHERE products.stock_quantity < 5", (err, res) => {
         if(err) console.log(err);
-        console.log(buildDisplayTable(res));
+        console.log(tableBuilder.buildManagerTable(res));
         managerMenu();
     });
 }
@@ -119,15 +119,6 @@ function addNewProduct() {
 // End connection and exit program
 function exit() {
     connection.end();
-}
-
-// Build manager display table, might move to a module
-function buildDisplayTable(data) {
-    const dataTable = [["Item ID", "Product Name", "Department", "Sale Price", "Stock Quantity"]];
-    data.forEach(row => {
-        dataTable.push([row.id, row.product_name, row.department_name, "$" + row.price, row.stock_quantity])
-    });
-    return table(dataTable);
 }
 
 // Connect to DB and run
