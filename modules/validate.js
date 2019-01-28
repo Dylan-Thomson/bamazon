@@ -35,10 +35,12 @@ function validateID(input) {
 
     // Get number of rows - max ID cannot exceed number of rows
     const testID = new Promise((resolve, reject) => {
-        connection.query("SELECT COUNT(*) FROM products", (err, res) => {
+        connection.query("SELECT products.id FROM products", (err, res) => {
             if(err) reject(err);
+            const ids = [];
+            res.forEach(row => ids.push(row.id));
             let result;
-            if(Number(input) > res[0]["COUNT(*)"]) {
+            if(!ids.includes(Number(input))) {
                 result = "Item number not found.";
             }
             else {
