@@ -62,7 +62,6 @@ function createNewDepartment() {
             over_head_costs: Number(input.over_head_costs)
         }, (err, res) => {
             if(err) throw err;
-            console.log(res);
             console.log("Added " + input.department_name + " department with overhead costs of " + input.over_head_costs);
             supervisorMenu();
         });

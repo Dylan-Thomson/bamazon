@@ -1,6 +1,6 @@
 # Bamazon
 
-Bamazon is a CLI storefront powered by a [MySQL](https://www.npmjs.com/package/mysql) database and written in [Node.js](https://nodejs.org/en/). 
+Bamazon is a CLI storefront powered by a [MySQL](https://www.npmjs.com/package/mysql) database and written in [Node.js](https://nodejs.org/en/). MySQL Workbench was used to create the database and its server.
 
 Customers are presented with a [table](https://www.npmjs.com/package/table) that displays available products (ID, Product Name, Price) for sale from the MySQL database. They are then prompted using [inquirer](https://www.npmjs.com/package/inquirer) to enter the ID number of the product they wish to purchase, followed by the quanitity. Bamazon queries the database to see if there is enough product stock to fulfill the order, and notifies the user if the order is too large to fill. Otherwise, it updates the stock quantity and sales columns of the product in the database and displays the purchase total to the customer.
 
@@ -26,3 +26,21 @@ Finally, creating and working with the database required a great deal of researc
 * [table](https://www.npmjs.com/package/table) for displaying tabular data in terminal
 * [dotenv](https://www.npmjs.com/package/dotenv) for hiding sensitive data from GitHub
 * [mysql](https://www.npmjs.com/package/mysql) for connecting to and working with MySQL database
+
+## Examples
+
+### Customer Purchase
+
+![customer](assets/images/customer.gif)
+
+### Manager View
+
+![managerView](assets/images/managerView.gif)
+
+### Manager Add
+
+![managerAdd](assets/images/managerAdd.gif)
+
+### Supervisor
+
+![supervisor](assets/images/supervisor.gif)
