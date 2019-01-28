@@ -11,6 +11,7 @@ const commands = {
     "Exit": new Command(exit)
 }
 
+// Prompt supervisor to run a function
 function supervisorMenu() {
     console.log("=========== BAMAZON SUPERVISOR ===========");
     inquirer.prompt([
@@ -25,8 +26,9 @@ function supervisorMenu() {
     });
 }
 
+// Display department overhead, total sales, and profit
 function viewProductSales() {
-    console.log("Viewing product sales by department");
+    console.log("=========== Viewing product sales by department ===========");
     let query = "SELECT departments.department_id, departments.department_name, departments.over_head_costs,";
     query += " SUM(products.product_sales) as department_sales, (SUM(products.product_sales) - departments.over_head_costs) as total_profit"
     query += " FROM departments LEFT JOIN products on departments.department_name = products.department_name";
@@ -39,7 +41,7 @@ function viewProductSales() {
 }
 
 function createNewDepartment() {
-    console.log("Creating new department");
+    console.log("=========== Creating new department ===========");
     inquirer.prompt([
         {
             type: "input",
@@ -53,7 +55,6 @@ function createNewDepartment() {
             validate: validate.validatePrice
         }
     ]).then(input => {
-        // console.log(input);
         connection.query("INSERT INTO departments SET ?",
         {
             department_name: input.department_name,

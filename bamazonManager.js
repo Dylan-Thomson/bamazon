@@ -30,7 +30,7 @@ function managerMenu() {
 
 // Display all products
 function viewProducts() {
-    console.log("Viewing Products");
+    console.log("=========== Viewing Products ===========");
     connection.query("SELECT * FROM products", (err, res) => {
         if(err) console.log(err);
         console.log(tableBuilder.buildManagerTable(res));
@@ -40,7 +40,7 @@ function viewProducts() {
 
 // Display products with less than 5 in stock
 function viewLowInventory() {
-    console.log("Viewing Low Inventory");
+    console.log("=========== Viewing Low Inventory ===========");
     connection.query("SELECT * FROM products WHERE products.stock_quantity < 5", (err, res) => {
         if(err) console.log(err);
         console.log(tableBuilder.buildManagerTable(res));
@@ -50,7 +50,7 @@ function viewLowInventory() {
 
 // Add stock to selected item
 function addInventory() {
-    console.log("Adding Inventory");
+    console.log("=========== Adding Inventory ===========");
     inquirer.prompt([
         {
             type: "input",
@@ -77,7 +77,7 @@ function addInventory() {
 
 // Insert new product into table
 function addNewProduct() {
-    console.log("Adding New Product");
+    console.log("=========== Adding New Product ===========");
     inquirer.prompt([
         {
             type: "input",

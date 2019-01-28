@@ -10,7 +10,6 @@ function buildCustomerProductTable(data) {
     return table(dataTable);
 }
 
-// Build manager display table, might move to a module
 function buildManagerTable(data) {
     const dataTable = [["Item ID", "Product Name", "Department", "Sale Price", "Stock Quantity"]];
     data.forEach(row => {
