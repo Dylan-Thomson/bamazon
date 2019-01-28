@@ -49,7 +49,7 @@ function purchasePrompt() {
 
 // Select product by ID and purchase if there is enough in stock
 function attemptTransaction(input) {
-    connection.query("SELECT products.product_name, products.stock_quantity, products.price FROM products WHERE ?", {id: input.itemID}, (err, res) => {
+    connection.query("SELECT products.product_name, products.stock_quantity, products.price, products.product_sales FROM products WHERE ?", {id: input.itemID}, (err, res) => {
         if(err) console.log(err);
         const item = res[0];
         if(input.purchaseQuantity > item.stock_quantity) {
@@ -64,10 +64,13 @@ function attemptTransaction(input) {
 
 // Update quantity of item in stock and display purchase total
 function purchase(input, item) {
-    connection.query("UPDATE products SET ? WHERE ?", 
+    connection.query("UPDATE products SET ?, ? WHERE ?", 
     [
         {
             stock_quantity: Number(item.stock_quantity) - Number(input.purchaseQuantity)
+        },
+        {
+            product_sales: Number(item.product_sales) + Number(item.price) * Number(input.purchaseQuantity)
         },
         {
             id: input.itemID
