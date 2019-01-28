@@ -27,6 +27,14 @@ function supervisorMenu() {
 
 function viewProductSales() {
     console.log("Viewing product sales by department");
+    connection.query("SELECT departments.department_id, departments.department_name, departments.over_head_costs, SUM(products.product_sales) as department_sales, (SUM(products.product_sales) - departments.over_head_costs) as total_profit FROM departments INNER JOIN products on departments.department_name = products.department_name GROUP BY departments.department_id", (err, res) => {
+        const data = [["Department ID", "Department Name", "Overhead Costs", "Department Sales", "Total Profit"]];
+        res.forEach(row => {
+            data.push([row.department_id, row.department_name, row.over_head_costs, row.department_sales, "$" + Number(row.total_profit).toFixed(2)]);
+        });
+        console.log(table(data));
+        supervisorMenu();
+    });
 }
 
 function createNewDepartment() {
